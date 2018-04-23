@@ -1,0 +1,62 @@
+# .screenrc
+
+defshell -bash 
+termcapinfo xterm* ti@:te@
+startup_message off
+vbell off
+autodetach on
+altscreen on
+shelltitle "$ |bash"
+defscrollback 10000
+defutf8 on
+nonblock on
+
+
+logfile ${HOME}/_screenrc_logs/Krish-Screen-%n-%Y%m%d-%c:%s.log
+
+logfile flush 1
+logtstamp on
+logtstamp on
+logtstamp after 5
+log on
+logtstamp string "-- time-stamp -- %Y-%m-%d %0c:%s --\012"
+
+# Start log ctrl+a shift+h
+
+hardstatus alwayslastline
+#hardstatus string '%{= kw}[ %{= kb}%H%{= kw} ][%= %{= kw}%?%-Lw%?%{= kW}%n*%f %t%?%?%{= kw}%?%+Lw%?%?%= ][ %{r}%l%{w} ]%{w}[%{r} %d/%m/%y %C %A %{w}]%{w}'
+
+#hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %m-%d %{W}%c %{g}]'
+
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %m-%d %{W}%c %{g}]'
+
+bind 'q' quit
+
+screen -t DCNComponent 0
+stuff "cd $PROJECT_SRC; export BASE_DIR=$PROJECT_SRC;bash^M"
+
+screen -t Code 1
+stuff "cd $PROJECT_SRC; export BASE_DIR=$PROJECT_SRC;bash^M"
+
+screen -t Code 2
+stuff "cd $PROJECT_SRC; export BASE_DIR=$PROJECT_SRC;bash^M"
+
+screen -t Code 3
+stuff "cd $PROJECT_SRC; export BASE_DIR=$PROJECT_SRC;bash^M"
+
+screen -t Code 4
+stuff "cd $PROJECT_SRC; export BASE_DIR=$PROJECT_SRC;bash^M"
+
+screen -t Code 5
+stuff "cd $PROJECT_SRC; export BASE_DIR=$PROJECT_SRC;bash^M"
+
+screen -t Code 6
+stuff "cd $PROJECT_SRC; export BASE_DIR=$PROJECT_SRC;bash^M"
+
+screen -t Code 7
+stuff "cd $PROJECT_SRC; export BASE_DIR=$PROJECT_SRC;bash^M"
+
+screen -t MyPrograms 8
+stuff "cd $PROJECT_SRC; export BASE_DIR=$PROJECT_SRC;bash^M"
+
+select 0
