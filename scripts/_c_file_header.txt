@@ -1,7 +1,7 @@
 :insert
 /**
  *  @file      FILE_NAME
- *  @copyright (C) 2018 Network Communications, Inc.
+ *  @copyright (C) 2018
  *  @brief     Implementation of
  *  @author    Krishnamoorthy N
  *  @date      DATE

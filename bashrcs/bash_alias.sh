@@ -41,7 +41,7 @@ alias gL='git log'
 
 alias bb='cd  $BUILDDIR && bitbake'
 
-alias MyScreen='screen -c $HOME/scripts/_screenrc/_screenrc_code -S Krish'
+alias MyScreen='screen -c $HOME/.bash_config/scripts/_screenrc/_screenrc_code -S Krish'
 alias Tach='screen -D -R `screen -ls | grep Krish | cut -c -13`'
 
 alias g='find . | xargs grep -rn '
@@ -59,12 +59,61 @@ alias Use='export BASE_DIR=$PWD && export CSCOPE_DB=$BASE_DIR/cscope.out'
 
 alias CscopeInit='$HOME/scripts/cscope_init.sh'
 alias CscopeBuild='$HOME/scripts/cscope_build.sh'
-alias CDcnCscope='$HOME/scripts/cscope_dcn.sh'
-alias Cgen='$HOME/scripts/cscope_ctag_gen.sh'
+alias CDcnCscope='$HOME/scripts/cscope_prj_src.sh'
+alias Cgen='${BASH_CONFIG}/scripts/cscope_ctag_gen.sh'
 alias C='cscope -d'
 
 alias BDir='cd $BASE_DIR'
-alias CTar='$HOME/scripts/component_tar.sh'
+alias CTar='$BASH_CONFIG/scripts/component_tar.sh'
 alias cs_build='export CSCOPE_DB=$BASE_DIR/cscope.out && $HOME/scripts/cscope_init.sh'
 alias Rsync='$HOME/scripts/rsync_patches.sh'
 
+export MY_NOTES_BASE=$HOME/data/git/opensource/MyNotes
+
+declare -A MyScreenMap
+MyScreenMap[Krish]="screen -c ${BASH_CONFIG}/scripts/_screenrc/_screenrc_krish -S Krish"
+MyScreenMap[Notes]="screen -c ${BASH_CONFIG}/scripts/_screenrc/_screenrc_my_notes -S MyNotes"
+
+Satch() {
+  if [ "Krish" != "$1" ]; then
+    cd /data/users/knatesan/_screenrc_logs
+  fi
+
+  screen_name=`screen -ls | grep $1 | cut -c -13`
+
+  if [ -z "$screen_name" ]; then
+    new_screen=${MyScreenMap[$1]}
+    $new_screen
+  else
+    screen -D -R $screen_name
+  fi
+}
+
+SList() {
+  for screens in "${!MyScreenMap[@]}"; do
+    echo $screens
+  done |
+  sort -n
+}
+
+declare -A MyFolderMap
+MyFolderMap[git]="${HOME}/data/git/opensource/MyNotes/dev_tools/git"
+
+ChDir() {
+  folder=${MyFolderMap[$1]}
+  echo "Arg:" $1 "Value: " ${folder}
+  cd ${folder}
+}
+
+ChDirList() {
+  for folder in "${!MyFolderMap[@]}"; do
+    echo $folder
+  done
+}
+
+log() {
+  now=`date +%d%h%Y-%T`
+  script $1_${now}.log
+}
+
+alias rm='rm -i'

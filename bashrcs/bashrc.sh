@@ -6,7 +6,7 @@ set -o notify
 set -o noclobber
 #set -o ignoreeof
 #set -o vim
-set show-all-if-ambiguous on
+#set show-all-if-ambiguous on
 
 # Enable options:
 shopt -s cdspell
@@ -200,14 +200,18 @@ function __makePS1() {
     else
         PS1+="\[${Green}\]" # normal user
     fi
-    PS1+="\u\[${Color_Off}\]"
+    if [ "${HOSTNAME}" != "cinscplp039" ]; then
+      PS1+="\u\[${Color_Off}\]"
 
     if [ -n "${SSH_CONNECTION}" ]; then
         PS1+="\[${BWhite}\]@"
         PS1+="\[${UWhite}${HOST_COLOR}\]\h\[${Color_Off}\]" # host displayed only if ssh connection
     fi
 
-    PS1+=":\[${BYellow}\]\w" # working directory
+      PS1+=":\[${BYellow}\]\w" # working directory
+    else
+      PS1+=":>>> \[${BYellow}\]\w" # working directory
+    fi
 
     # background jobs
     local NO_JOBS=`jobs -p | wc -w`
@@ -216,21 +220,21 @@ function __makePS1() {
     fi
 
     # screen sessions
-    local SCREEN_PATHS="/var/run/screens/S-`whoami` /var/run/screen/S-`whoami` /var/run/uscreens/S-`whoami`"
+    # local SCREEN_PATHS="/var/run/screens/S-`whoami` /var/run/screen/S-`whoami` /var/run/uscreens/S-`whoami`"
 
-    for screen_path in ${SCREEN_PATHS}; do
-        if [ -d ${screen_path} ]; then
-            SCREEN_JOBS=`ls ${screen_path} | wc -w`
-            if [ ${SCREEN_JOBS} != 0 ]; then
-                local current_screen="$(echo ${STY} | cut -d '.' -f 1)"
-                if [ -n "${current_screen}" ]; then
-                    current_screen=":${current_screen}"
-                fi
-                PS1+=" \[${BGreen}\][s${SCREEN_JOBS}${current_screen}]\[${Color_Off}\]"
-            fi
-            break
-        fi
-    done
+    # for screen_path in ${SCREEN_PATHS}; do
+    #     if [ -d ${screen_path} ]; then
+    #         SCREEN_JOBS=`ls ${screen_path} | wc -w`
+    #         if [ ${SCREEN_JOBS} != 0 ]; then
+    #             local current_screen="$(echo ${STY} | cut -d '.' -f 1)"
+    #             if [ -n "${current_screen}" ]; then
+    #                 current_screen=":${current_screen}"
+    #             fi
+    #             PS1+=" \[${BGreen}\][s${SCREEN_JOBS}${current_screen}]\[${Color_Off}\]"
+    #         fi
+    #         break
+    #     fi
+    # done
 
     # git branch
     if [ -x "`which git 2>&1`" ]; then
@@ -241,7 +245,7 @@ function __makePS1() {
             local letters="$( echo "${git_status}" | grep --regexp=' \w ' | sed -e 's/^\s\?\(\w\)\s.*$/\1/' )"
             local untracked="$( echo "${git_status}" | grep -F '?? ' | sed -e 's/^\?\(\?\)\s.*$/\1/' )"
             local status_line="$( echo -e "${letters}\n${untracked}" | sort | uniq | tr -d '[:space:]' )"
-            PS1+=" \[${BBlue}\](${branch}"
+            PS1+=" \[${BRed}\](${branch}"
             if [ -n "${status_line}" ]; then
                 PS1+=" ${status_line}"
             fi
@@ -254,7 +258,9 @@ function __makePS1() {
         PS1+=" \[${BRed}\][!${EXIT}]\[${Color_Off}\]"
     fi
 
-    PS1+=" \[${BPurple}\]\\$\[${Color_Off}\] " # prompt
+    PS1+=" \[${BPurple}\] " # prompt
+    PS1+="\\n"
+    PS1+=" \\$\[${Color_Off}\] " # prompt
 
     __makeTerminalTitle
 }
@@ -289,7 +295,9 @@ fi
 
 umask 022
 
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
+if [ -d "$HOME/data/bin" ] ; then
+    PATH="$HOME/data/bin:$PATH"
 fi
+
+LS_COLORS='di=0;35' ; export LS_COLORS
 

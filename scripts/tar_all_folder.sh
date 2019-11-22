@@ -1,7 +1,5 @@
-
-for d in */ ; do
+cd $PWD
+for d in *.log ; do
   echo "$d"
-  ARRAY=$(echo $d | tr "/" "\n")
-  echo "$ARRAY"
-tar cvzf ${ARRAY}.tgz $d
+tar cvzf ${d}.tgz $d
 done

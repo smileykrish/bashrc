@@ -12,7 +12,7 @@ defutf8 on
 nonblock on
 
 
-logfile ${HOME}/_screenrc_logs/Krish-Screen-%n-%Y%m%d-%c:%s.log
+logfile ${HOME}/data/_screenrc_logs/Krish-Screen-%n-%Y%m%d-%c:%s.log
 
 logfile flush 1
 logtstamp on
