@@ -299,5 +299,10 @@ if [ -d "$HOME/data/bin" ] ; then
     PATH="$HOME/data/bin:$PATH"
 fi
 
+if [ -d "$BASH_CONFIG/scripts" ] ; then
+    PATH="$BASH_CONFIG/scripts:$PATH"
+fi
+
+
 LS_COLORS='di=0;35' ; export LS_COLORS
 

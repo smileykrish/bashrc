@@ -38,5 +38,4 @@ done
 echo $COMPONENT_TAR
 echo "Dest@"$DEST_FOLDER
 cd $DEST_FOLDER
-#tar cvzf $COMPONENT_TAR $COMPONENT
-tar cvzf $COMPONENT_TAR --exclude .git $COMPONENT
+tar cvzf $COMPONENT_TAR --exclude .git $COMPONENT --dereference

@@ -41,7 +41,6 @@ alias gL='git log'
 
 alias bb='cd  $BUILDDIR && bitbake'
 
-alias MyScreen='screen -c $HOME/.bash_config/scripts/_screenrc/_screenrc_code -S Krish'
 alias Tach='screen -D -R `screen -ls | grep Krish | cut -c -13`'
 
 alias g='find . | xargs grep -rn '
@@ -57,16 +56,14 @@ alias Junk='find . -name *.swp | xargs rm -f; find . -name *.*~ | xargs rm -f'
 alias U='export BASE_DIR=$PWD && export CSCOPE_DB=$BASE_DIR/cscope.out'
 alias Use='export BASE_DIR=$PWD && export CSCOPE_DB=$BASE_DIR/cscope.out'
 
-alias CscopeInit='$HOME/scripts/cscope_init.sh'
-alias CscopeBuild='$HOME/scripts/cscope_build.sh'
-alias CDcnCscope='$HOME/scripts/cscope_prj_src.sh'
-alias Cgen='${BASH_CONFIG}/scripts/cscope_ctag_gen.sh'
-alias C='cscope -d'
+alias CscopeComponent='${BASH_CONFIG}/scripts/cscope_component.sh'
+alias CscopeBuild='$BASH_CONFIG/scripts/cscope_build.sh'
+alias CscopeProject='$BASH_CONFIG/scripts/cscope_project.sh'
 
-alias BDir='cd $BASE_DIR'
 alias CTar='$BASH_CONFIG/scripts/component_tar.sh'
-alias cs_build='export CSCOPE_DB=$BASE_DIR/cscope.out && $HOME/scripts/cscope_init.sh'
-alias Rsync='$HOME/scripts/rsync_patches.sh'
+alias cs_build='export CSCOPE_DB=$BASE_DIR/cscope.out && $BASH_CONFIG/scripts/cscope_init.sh'
+
+alias Cgen='${BASH_CONFIG}/scripts/cscope_component.sh ${BASE_DIR}'
 
 export MY_NOTES_BASE=$HOME/data/git/opensource/MyNotes
 
@@ -116,4 +113,10 @@ log() {
   script $1_${now}.log
 }
 
-alias rm='rm -i'
+gWT() {
+  ${BASH_CONFIG}/scripts/git-new-workdir $1 $2 $3
+}
+
+# alias rm='$BASH_CONFIG/scripts/rm_cmd.sh'
+# alias rmP='$BASH_CONFIG/scripts/rm_permanent.sh'
+
