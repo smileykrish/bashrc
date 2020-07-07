@@ -67,6 +67,8 @@ alias Cgen='${BASH_CONFIG}/scripts/cscope_component.sh ${BASE_DIR}'
 
 export MY_NOTES_BASE=$HOME/data/git/opensource/MyNotes
 
+source ${BASH_CONFIG}/scripts/persistDB.sh
+
 declare -A MyScreenMap
 MyScreenMap[Krish]="screen -c ${BASH_CONFIG}/scripts/_screenrc/_screenrc_krish -S Krish"
 MyScreenMap[Notes]="screen -c ${BASH_CONFIG}/scripts/_screenrc/_screenrc_my_notes -S MyNotes"
@@ -120,3 +122,91 @@ gWT() {
 # alias rm='$BASH_CONFIG/scripts/rm_cmd.sh'
 # alias rmP='$BASH_CONFIG/scripts/rm_permanent.sh'
 
+c() {
+  flag=0
+  alt_work=""
+  work_dir=""
+  alt_work_dir=""
+  del_flag=0
+
+  if [ $# -ge 2 ]; then
+    alt_work=work_dir_$2
+  fi
+
+  if [ $# -eq 3 ]; then
+    if [ "-d" == $3 ]; then
+      del_flag=1
+    else
+     return
+   fi
+  fi
+
+  persistDB_get $1
+  if [[ 0 == $? ]]
+  then
+    echo "Found"
+    IFS=' ' read -r -a array <<< "$persistDB_return"
+    key=${array[0]}
+    echo "Key: $key"
+
+    if [[ 3 == ${#array[@]} ]]
+    then
+      repo_name=${array[1]}
+      recipe_name=${array[2]}
+
+      echo "Respo Name: $repo_name"
+      echo "Recipe Name: $recipe_name"
+
+      work_dir="$PROJECT_REPOS/${recipe_name[$key]}"
+
+      if [[ $alt_work ]]
+      then
+        IFS='/' read -ra array <<< "$PROJECT_REPOS"
+        project_name=${array[-1]}
+        alt_work_dir="$HOME/data/AlternateWS/$alt_work/$project_name/${recipe_name[$key]}"
+      fi
+    elif [[ 2 == ${#array[@]} ]]
+    then
+      folder=${array[1]}
+      IFS='/' read -ra array <<< "$folder"
+
+      work_dir=$HOME/$folder
+      if [[ $alt_work ]]
+      then
+        alt_work_dir="$HOME/data/AlternateWS/$alt_work/buildspace/${array[-1]}"
+      fi
+      flag=1
+    fi
+  else
+    echo "Not Found"
+    return
+  fi
+
+  echo "Work: $work_dir"
+  echo "AltWork: $alt_work"
+  echo "AltWorkDir: $alt_work_dir"
+
+  if [ $alt_work ]; then
+    if [ ! -d "$alt_work_dir" ]; then
+      if [ $flag -eq 1 ]; then
+        mkdir -p $alt_work_dir
+      else
+        $BASH_CONFIG/scripts/git-new-workdir $work_dir $alt_work_dir
+      fi
+    fi
+    if [[ 0 == $del_flag ]]
+    then
+      cd $alt_work_dir
+      Use
+      Cgen
+    else
+      rm -rf $alt_work_dir
+    fi
+  else
+    if [ -d "$work_dir" ]; then
+      cd $work_dir
+      Use
+      Cgen
+    fi
+  fi
+}
