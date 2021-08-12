@@ -136,47 +136,59 @@ c() {
   if [ $# -eq 3 ]; then
     if [ "-d" == $3 ]; then
       del_flag=1
-    else
-     return
    fi
   fi
 
   persistDB_get $1
   if [[ 0 == $? ]]
   then
-    echo "Found"
     IFS=' ' read -r -a array <<< "$persistDB_return"
     key=${array[0]}
+    cmd=${array[1]}
     echo "Key: $key"
 
-    if [[ 3 == ${#array[@]} ]]
-    then
-      repo_name=${array[1]}
-      recipe_name=${array[2]}
+    case "$cmd" in
+      '-component')
+        repo_name=${array[2]}
+        recipe_name=${array[3]}
 
-      echo "Respo Name: $repo_name"
-      echo "Recipe Name: $recipe_name"
+        echo "Respo Name: $repo_name"
+        echo "Recipe Name: $recipe_name"
 
-      work_dir="$PROJECT_REPOS/${recipe_name[$key]}"
+        work_dir="$PROJECT_REPOS/${recipe_name[$key]}"
 
-      if [[ $alt_work ]]
-      then
-        IFS='/' read -ra array <<< "$PROJECT_REPOS"
-        project_name=${array[-1]}
-        alt_work_dir="$HOME/data/AlternateWS/$alt_work/$project_name/${recipe_name[$key]}"
-      fi
-    elif [[ 2 == ${#array[@]} ]]
-    then
-      folder=${array[1]}
-      IFS='/' read -ra array <<< "$folder"
+        if [[ $alt_work ]]
+        then
+          IFS='/' read -ra array <<< "$PROJECT_REPOS"
+          project_name=${array[-1]}
+          alt_work_dir="$HOME/data/AlternateWS/$alt_work/$project_name/${recipe_name[$key]}"
+        fi
+        ;;
+      '-build')
+        folder=${array[2]}
+        IFS='/' read -ra array <<< "$folder"
 
-      work_dir=$HOME/$folder
-      if [[ $alt_work ]]
-      then
-        alt_work_dir="$HOME/data/AlternateWS/$alt_work/buildspace/${array[-1]}"
-      fi
-      flag=1
-    fi
+        work_dir=$HOME/$folder
+        if [[ $alt_work ]]
+        then
+          alt_work_dir="$HOME/data/AlternateWS/$alt_work/buildspace/${array[-1]}"
+        fi
+        flag=1
+        ;;
+      '-cmd')
+        command="${array[@]:2}"
+        args=("$@")
+        ELEMENTS=${#args[@]}
+        var_args=""
+        for (( i=1;i<$ELEMENTS;i++ )); do
+          var_args="$var_args ${args[${i}]}"
+        done
+        command="$command $var_args"
+        echo "Command: $command"
+        eval ${command} $var_args
+        return
+        ;;
+    esac
   else
     echo "Not Found"
     return
@@ -194,19 +206,27 @@ c() {
         $BASH_CONFIG/scripts/git-new-workdir $work_dir $alt_work_dir
       fi
     fi
+    echo $del_flag
     if [[ 0 == $del_flag ]]
     then
       cd $alt_work_dir
       Use
-      Cgen
+      if [[ "-component" == $cmd ]];
+      then
+        Cgen
+      fi
     else
+      echo $alt_work_dir
       rm -rf $alt_work_dir
     fi
   else
     if [ -d "$work_dir" ]; then
       cd $work_dir
       Use
-      Cgen
+      if [[ "-component" == $cmd ]];
+      then
+        Cgen
+      fi
     fi
   fi
 }

@@ -5,6 +5,9 @@
 # input : Base directory to generate database
 #
 ################################################################################
+
+source $BASH_CONFIG/scripts/colors.sh
+
 if test $# -eq 1
 then
 COMPONENT_BASE=$1
@@ -16,15 +19,21 @@ else
   COMPONENT_BASE=$PWD
 fi
 
-echo "Component Base is: $COMPONENT_BASE"
+# Split the path into array with the delimter of "/"
+IFS='/' read -ra ARRAY <<< "$COMPONENT_BASE"
+COMPONENT=${ARRAY[-1]}
+
+printf "Component: ${GREEN}$COMPONENT${NC}\n"
 
 rm -f  $COMPONENT_BASE/cscope.*
-find -L $COMPONENT_BASE -name '*.h' > $COMPONENT_BASE/cscope.files
-find -L $COMPONENT_BASE -name '*.cc' >> $COMPONENT_BASE/cscope.files
+find -L $COMPONENT_BASE -path $COMPONENT_BASE/test -prune -false -o -name '*.h' > $COMPONENT_BASE/cscope.files
+find -L $COMPONENT_BASE -path $COMPONENT_BASE/test -prune -false -o -name '*.cc' >> $COMPONENT_BASE/cscope.files
 find -L $COMPONENT_BASE -name '*.cpp' >> $COMPONENT_BASE/cscope.files
 find -L $COMPONENT_BASE -name '*.c' >> $COMPONENT_BASE/cscope.files
 
 cd ${COMPONENT_BASE}
 ctags --c++-kinds=+p --fields=+iaS --extra=+q -L $COMPONENT_BASE/cscope.files
-/usr/bin/cscope -b -q -k
-#cscope -qbR -i cscope.files
+
+if [ -s $COMPONENT_BASE/cscope.files ]; then
+  cscope -qbR -i $COMPONENT_BASE/cscope.files
+fi

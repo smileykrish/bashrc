@@ -2,7 +2,6 @@
 
 rm -f  $PWD/cscope.*
 for file in `find $PWD -name "cscope.files"` ; do
-  echo "$file"
   cat $file >> $PWD/cscope.files
 done
 ctags -L $PWD/cscope.files
