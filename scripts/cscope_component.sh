@@ -19,6 +19,13 @@ else
   COMPONENT_BASE=$PWD
 fi
 
+if test $# -eq 2
+then
+  FLAG=$2
+else
+  FLAG="src"
+fi
+
 # Split the path into array with the delimter of "/"
 IFS='/' read -ra ARRAY <<< "$COMPONENT_BASE"
 COMPONENT=${ARRAY[-1]}
@@ -31,6 +38,10 @@ find -L $COMPONENT_BASE -path $COMPONENT_BASE/test -prune -false -o -name '*.cc'
 find -L $COMPONENT_BASE -name '*.cpp' >> $COMPONENT_BASE/cscope.files
 find -L $COMPONENT_BASE -name '*.c' >> $COMPONENT_BASE/cscope.files
 
+if [ "$FLAG" == "all" ]; then
+  find -L $COMPONENT_BASE -path $COMPONENT_BASE/src -prune -false -o -name '*.h' >> $COMPONENT_BASE/cscope.files
+  find -L $COMPONENT_BASE -path $COMPONENT_BASE/src -prune -false -o -name '*.cc' >> $COMPONENT_BASE/cscope.files
+fi
 cd ${COMPONENT_BASE}
 ctags --c++-kinds=+p --fields=+iaS --extra=+q -L $COMPONENT_BASE/cscope.files
 

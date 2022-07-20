@@ -48,11 +48,11 @@ persistDB_get() {
 # Usage: persistDB_add <key> [value]
 persistDB_add() {
   key="$1"
-  value="$2"
+  value="$@"
 
   test -f "$PERSISTDB" || touch "$PERSISTDB"
 
-  echo "$key $value" > "$PERSISTDB"
+  echo "$value" >> "$PERSISTDB"
 }
 
 # Usage: persistDB_del <key>

@@ -1,3 +1,5 @@
+source ${BASH_CONFIG}/scripts/colors.sh
+
 shopt -s expand_aliases
 #-------------------------------------------------------------
 # The 'ls' family (this assumes you use a recent GNU ls).
@@ -39,7 +41,6 @@ alias glola='git log --graph --decorate --pretty=oneline --abbrev-commit --name-
 alias gL='git log'
 
 
-alias bb='cd  $BUILDDIR && bitbake'
 
 alias Tach='screen -D -R `screen -ls | grep Krish | cut -c -13`'
 
@@ -65,7 +66,9 @@ alias cs_build='export CSCOPE_DB=$BASE_DIR/cscope.out && $BASH_CONFIG/scripts/cs
 
 alias Cgen='${BASH_CONFIG}/scripts/cscope_component.sh ${BASE_DIR}'
 
-export MY_NOTES_BASE=$HOME/data/git/opensource/MyNotes
+alias CgenAll='${BASH_CONFIG}/scripts/cscope_component.sh ${BASE_DIR} all'
+
+export MY_NOTES_BASE=$HOME/repos/opensource/MyNotes
 
 source ${BASH_CONFIG}/scripts/persistDB.sh
 
@@ -75,7 +78,7 @@ MyScreenMap[Notes]="screen -c ${BASH_CONFIG}/scripts/_screenrc/_screenrc_my_note
 
 Satch() {
   if [ "Krish" != "$1" ]; then
-    cd /data/users/knatesan/_screenrc_logs
+    cd $HOME/_screenrc_logs
   fi
 
   screen_name=`screen -ls | grep $1 | cut -c -13`
@@ -96,7 +99,7 @@ SList() {
 }
 
 declare -A MyFolderMap
-MyFolderMap[git]="${HOME}/data/git/opensource/MyNotes/dev_tools/git"
+MyFolderMap[git]="${HOME}/repos/opensource/MyNotes/dev_tools/git"
 
 ChDir() {
   folder=${MyFolderMap[$1]}
@@ -119,8 +122,92 @@ gWT() {
   ${BASH_CONFIG}/scripts/git-new-workdir $1 $2 $3
 }
 
+bb() {
+  tmp=$PWD
+  cd $BUILDDIR
+  bitbake $@
+  cd $tmp
+}
+
+
 # alias rm='$BASH_CONFIG/scripts/rm_cmd.sh'
 # alias rmP='$BASH_CONFIG/scripts/rm_permanent.sh'
+
+b() {
+  flag=0
+  alt_work=""
+  work_dir=""
+  alt_work_dir=""
+  build_dir=""
+  del_flag=0
+
+  if [ $# -ge 2 ]; then
+    alt_work=work_dir_$2
+  fi
+
+  if [ $# -eq 3 ]; then
+    if [ "-d" == $3 ]; then
+      del_flag=1
+   fi
+  fi
+
+  persistDB_get $1
+  if [[ 0 == $? ]]
+  then
+    IFS=' ' read -r -a array <<< "$persistDB_return"
+    key=${array[0]}
+    cmd=${array[1]}
+    printf "${YELLOW}Key:${NC} $key"
+
+    case "$cmd" in
+      '-component')
+        repo_name=${array[2]}
+        recipe_name=${array[3]}
+
+        printf "\t\t${YELLOW}Respo Name:${NC} $repo_name\t\t${YELLOW}Recipe Name:${NC} $recipe_name"
+
+        IFS='-' read -ra recipe_name_arr <<< "$recipe_name"
+        unset 'recipe_name_arr[${#recipe_name_arr[@]}-1]'
+        recipe_file_name=""
+        for i in "${recipe_name_arr[@]}"; do
+          recipe_file_name="$recipe_file_name-$i"
+        done
+
+        work_dir="$PROJECT_REPOS/${recipe_name[$key]}"
+        build_dir="$HOME/AlternateWS/comp_build/$recipe_name"
+
+        if [[ $alt_work ]]
+        then
+          IFS='/' read -ra array <<< "$PROJECT_REPOS"
+          project_name=${array[-1]}
+          work_dir="$HOME/AlternateWS/$alt_work/$project_name/${recipe_name[$key]}"
+        fi
+        printf "\n${YELLOW}Work:${NC} $work_dir\n"
+        printf "${YELLOW}BuildDir:${NC} $build_dir\n"
+        if [[ $alt_work ]] ; then
+          printf "${YELLOW}AltWork:${NC} $alt_work"
+        fi
+        printf "${YELLOW}   PokyBuild:${NC} $BUILDDIR"
+
+        if [[ $BUILDDIR ]]
+        then
+          if grep -q "EXTERNALSRC_pn$recipe_file_name" "$BUILDDIR/conf/local.conf"
+          then
+            printf "${YELLOW}\nExternal source EXTERNALSRC_pn$recipe_file_name already present${NC}\n"
+          else
+            echo "EXTERNALSRC_pn$recipe_file_name = \"$work_dir\"" >> $BUILDDIR/conf/local.conf
+            echo "EXTERNALSRC_BUILD_pn$recipe_file_name = \"$build_dir\"" >> $BUILDDIR/conf/local.conf
+            printf "\n"
+          fi
+        fi
+        printf "\n"
+        ;;
+    esac
+  else
+    printf "${RED}Not Found${NC}"
+    return
+  fi
+}
 
 c() {
   flag=0
@@ -145,15 +232,14 @@ c() {
     IFS=' ' read -r -a array <<< "$persistDB_return"
     key=${array[0]}
     cmd=${array[1]}
-    echo "Key: $key"
+    printf "${YELLOW}Key:${NC} $key"
 
     case "$cmd" in
       '-component')
         repo_name=${array[2]}
         recipe_name=${array[3]}
 
-        echo "Respo Name: $repo_name"
-        echo "Recipe Name: $recipe_name"
+        printf "\t\t${YELLOW}Respo Name:${NC} $repo_name\t\t${YELLOW}Recipe Name:${NC} $recipe_name"
 
         work_dir="$PROJECT_REPOS/${recipe_name[$key]}"
 
@@ -161,17 +247,19 @@ c() {
         then
           IFS='/' read -ra array <<< "$PROJECT_REPOS"
           project_name=${array[-1]}
-          alt_work_dir="$HOME/data/AlternateWS/$alt_work/$project_name/${recipe_name[$key]}"
+          alt_work_dir="$HOME/AlternateWS/$alt_work/$project_name/${recipe_name[$key]}"
         fi
         ;;
       '-build')
+        command="${array[@]:3}"
+        printf "\n${YELLOW}Command:${NC} $command"
         folder=${array[2]}
         IFS='/' read -ra array <<< "$folder"
 
         work_dir=$HOME/$folder
         if [[ $alt_work ]]
         then
-          alt_work_dir="$HOME/data/AlternateWS/$alt_work/buildspace/${array[-1]}"
+          alt_work_dir="$HOME/AlternateWS/$alt_work/buildspace/${array[-1]}"
         fi
         flag=1
         ;;
@@ -184,19 +272,21 @@ c() {
           var_args="$var_args ${args[${i}]}"
         done
         command="$command $var_args"
-        echo "Command: $command"
+        printf "\n${YELLOW}Command:${NC} $command"
         eval ${command} $var_args
         return
         ;;
     esac
   else
-    echo "Not Found"
+    printf "${RED}Not Found${NC}"
     return
   fi
 
-  echo "Work: $work_dir"
-  echo "AltWork: $alt_work"
-  echo "AltWorkDir: $alt_work_dir"
+  printf "\n${YELLOW}Work:${NC} $work_dir\n"
+  if [[ $alt_work ]] ; then
+    printf "${YELLOW}AltWork:${NC} $alt_work"
+    printf "${YELLOW}AltWorkDir:${NC} $alt_work_dir\n"
+  fi
 
   if [ $alt_work ]; then
     if [ ! -d "$alt_work_dir" ]; then
@@ -213,6 +303,13 @@ c() {
       Use
       if [[ "-component" == $cmd ]];
       then
+        CHANGED=$(git diff-index --name-only HEAD --)
+        if [ "$CHANGED" ]; then
+          echo "Changes present do manual pull"
+        else
+          echo "No Changes so pull remote"
+          gP
+        fi
         Cgen
       fi
     else
@@ -222,11 +319,20 @@ c() {
   else
     if [ -d "$work_dir" ]; then
       cd $work_dir
+      eval ${command}
       Use
       if [[ "-component" == $cmd ]];
       then
+        CHANGED=$(git diff-index --name-only HEAD --)
+        if [ "$CHANGED" ]; then
+          echo "Changes present do manual pull"
+        else
+          echo "No Changes so pull remote"
+          gP
+        fi
         Cgen
       fi
     fi
   fi
 }
+
