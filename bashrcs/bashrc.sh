@@ -303,6 +303,10 @@ if [ -d "$BASH_CONFIG/scripts" ] ; then
     PATH="$BASH_CONFIG/scripts:$PATH"
 fi
 
+if [ -d "$HOME/protobufc/bin" ] ; then
+    PATH="$HOME/protobufc/bin:$PATH"
+fi
+
 
 LS_COLORS='di=0;35' ; export LS_COLORS
 

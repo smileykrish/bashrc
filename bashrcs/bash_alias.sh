@@ -75,20 +75,31 @@ source ${BASH_CONFIG}/scripts/persistDB.sh
 declare -A MyScreenMap
 MyScreenMap[Krish]="screen -c ${BASH_CONFIG}/scripts/_screenrc/_screenrc_krish -S Krish"
 MyScreenMap[Notes]="screen -c ${BASH_CONFIG}/scripts/_screenrc/_screenrc_my_notes -S MyNotes"
+MyScreenMap[Console]="screen -c ${BASH_CONFIG}/scripts/_screenrc/_screenrc_krish -S Console"
 
 Satch() {
   if [ "Krish" != "$1" ]; then
     cd $HOME/_screenrc_logs
   fi
 
-  screen_name=`screen -ls | grep $1 | cut -c -13`
-
-  if [ -z "$screen_name" ]; then
+  if [ $# >= 3 && "New" == "$2" ]; then
     new_screen=${MyScreenMap[$1]}
     $new_screen
   else
-    screen -D -R $screen_name
+    screen_name=`screen -ls | grep $1 | cut -c -13`
+
+    if [ -z "$screen_name" ]; then
+      new_screen=${MyScreenMap[$1]}
+      $new_screen
+    else
+      screen -D -R $screen_name
+    fi
   fi
+}
+
+Skill() {
+  screen_name=`screen -ls | grep $1 | cut -c -13`
+  screen -X -S $screen_name quit
 }
 
 SList() {
@@ -218,12 +229,12 @@ c() {
 
   if [ $# -ge 2 ]; then
     alt_work=work_dir_$2
-  fi
-
-  if [ $# -eq 3 ]; then
+  elif [ $# -eq 3 ]; then
     if [ "-d" == $3 ]; then
       del_flag=1
-   fi
+    fi
+  elif [ $# -eq 0 ]; then
+    persistDB_list
   fi
 
   persistDB_get $1
@@ -236,6 +247,7 @@ c() {
 
     case "$cmd" in
       '-component')
+        command=""
         repo_name=${array[2]}
         recipe_name=${array[3]}
 
@@ -332,7 +344,28 @@ c() {
         fi
         Cgen
       fi
+    else
+      mkdir -p $work_dir
+      cd $work_dir
+      eval ${command}
+      Use
     fi
   fi
 }
 
+PProto() {
+  echo $1 | xxd -r -p | /home/knatesan/protobufc/bin/protoc --decode_raw
+}
+
+RPhy() {
+  python setup.py build &&  python setup.py install && python build/scripts-3.6/$@
+}
+
+JLog() {
+  source /home/knatesan/MY_VIRT3/bin/activate
+  python $HOME/repos/My_Framework-3.6.8/bin/jira_get_attach.py $@
+}
+
+CS() {
+  cscope -R
+}
