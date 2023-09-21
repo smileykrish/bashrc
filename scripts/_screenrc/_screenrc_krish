@@ -1,0 +1,46 @@
+# .screenrc
+
+source ${BASH_CONFIG}/scripts/_screenrc/_screenrc_common
+
+# Start log ctrl+a shift+h
+deflog off
+
+screen -t DCN 0
+stuff "cd $HOME/repos/1finity/dcn; export BASE_DIR=$HOME/repos/1finity/dcn;bash^M"
+screen -t Code 1
+stuff "cd $HOME/repos/1finity/dcn; export BASE_DIR=$HOME/repos/1finity/dcn;bash^M"
+
+screen -t Code 2
+stuff "cd $HOME/repos/1finity/dcn; export BASE_DIR=$HOME/repos/1finity/dcn;bash^M"
+screen -t Code 3
+stuff "cd $HOME/repos/1finity/dcn; export BASE_DIR=$HOME/repos/1finity/dcn;bash^M"
+
+screen -t Code 4
+stuff "cd $HOME/repos/1finity/dcn; export BASE_DIR=$HOME/repos/1finity/dcn;bash^M"
+select 0
+
+screen -t Log 5
+stuff "cd $HOME/repos/1finity/dcn; export BASE_DIR=$HOME/repos/1finity/dcn;bash^M"
+
+screen -t Code 6
+stuff "cd $HOME/repos/1finity/dcn; export BASE_DIR=$HOME/repos/1finity/dcn;bash^M"
+
+screen -t Code 7
+stuff "cd $HOME/repos/1finity/dcn; export BASE_DIR=$HOME/repos/1finity/dcn;bash^M"
+
+screen -t MyPrg 8
+stuff "cd $HOME/repos/opensource/sample-program/; export BASE_DIR=$HOME/repos/opensource/sample-program/;bash^M"
+
+screen -t Build 9
+stuff "cd $HOME/Products/fss3; export BASE_DIR=$HOME/Products/fss3;bash^M"
+
+screen -t Qemu 10
+stuff "cd $HOME/Products/fss3; export BASE_DIR=$HOME/Products/fss3;bash^M"
+
+screen -t Qemu 11
+stuff "cd $HOME/Products/fss3; export BASE_DIR=$HOME/Products/fss3;bash^M"
+
+screen -t Qemu 12
+stuff "cd $HOME/Products/fss3; export BASE_DIR=$HOME/Products/fss3;bash^M"
+
+select 1

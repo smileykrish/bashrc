@@ -1,0 +1,24 @@
+# .screenrc
+
+source ${BASH_CONFIG}/scripts/_screenrc/_screenrc_common
+
+log on 
+logfile ${HOME}/_screenrc_logs/NEConsole-%n-%Y%m%d-%c:%s.log
+
+screen -t DHCP-Srv 0
+stuff "bash^M"
+screen -t NE-1 1
+stuff "bash^M"
+screen -t NE-2 2
+stuff "bash^M"
+screen -t NE-3 3
+stuff "bash^M"
+screen -t NE-4 4
+stuff "bash^M"
+screen -t NE-5 5
+stuff "bash^M"
+screen -t NE-6 6
+stuff "bash^M"
+screen -t NE-7 7
+
+select 1

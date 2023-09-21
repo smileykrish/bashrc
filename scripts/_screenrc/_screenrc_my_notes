@@ -1,0 +1,13 @@
+# .screenrc
+
+source ${BASH_CONFIG}/scripts/_screenrc/_screenrc_common
+
+# Start log ctrl+a shift+h
+deflog off
+
+screen -t Notes 0
+stuff "cd $HOME/repos/my_notes;U;bash^M"
+screen -t Project 1
+stuff "cd $HOME/repos/my_project_notes;U;bash^M"
+
+select 0
